@@ -47,7 +47,8 @@ jobs:
         working-directory: app
 
       - name: Run tests with coverage
-        run: go test -coverprofile=coverage.txt
+        run: |
+          go test -v -coverprofile=coverage.out ./...
         working-directory: app
 
       - name: Upload coverage reports to Codecov
