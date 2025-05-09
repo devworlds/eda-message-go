@@ -8,6 +8,7 @@ import (
 	"time"
 
 	//third-party
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gorilla/websocket"
 )
 
@@ -43,6 +44,7 @@ func (h *Hub) Run() {
 		for client := range h.clients {
 			err := client.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
+				log.Errorf("Failed to send message to client: %v", err)
 				client.Close()
 				delete(h.clients, client)
 			}
