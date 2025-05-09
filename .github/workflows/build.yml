@@ -47,15 +47,14 @@ jobs:
         working-directory: app
 
       - name: Run tests with coverage
-        run: |
-          go test -v -coverprofile=coverage.out ./...
+        run: go test -coverprofile=coverage.txt
         working-directory: app
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          files: coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
 
       - name: Build
         run: go build -v ./...
