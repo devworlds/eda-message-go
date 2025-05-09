@@ -44,7 +44,9 @@ func (h *Hub) Run() {
 			err := client.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
 				fmt.Printf("Failed to send message to client: %v", err)
-				client.Close()
+				if cerr := client.Close(); cerr != nil {
+					fmt.Printf("Error closing client: %v\n", cerr)
+				}
 				delete(h.clients, client)
 			}
 		}
@@ -69,7 +71,9 @@ func HandleWebSocket(hub *Hub) http.HandlerFunc {
 		}
 		defer func() {
 			fmt.Println("Closing connection")
-			conn.Close()
+			if err := conn.Close(); err != nil {
+				fmt.Printf("Error closing connection: %v\n", err)
+			}
 		}()
 
 		hub.AddClient(conn)
