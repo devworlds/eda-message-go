@@ -16,6 +16,10 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
+// Update the testBroadcastTrigger and testMessageSent channels to be buffered.
+var testBroadcastTrigger = make(chan struct{}, 1)
+var testMessageSent = make(chan struct{}, 1)
+
 // Hub maintains the set of active clients and broadcasts messages to them.
 type Hub struct {
 	clients   map[*websocket.Conn]bool
@@ -54,7 +58,7 @@ func (h *Hub) AddClient(conn *websocket.Conn) {
 	h.mu.Unlock()
 }
 
-// RemoveClient removes a client from the Hub's list of clients.
+// Add more detailed logging to debug the message flow.
 func HandleWebSocket(hub *Hub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -62,14 +66,29 @@ func HandleWebSocket(hub *Hub) http.HandlerFunc {
 			fmt.Println("Failed to upgrade connection:", err)
 			return
 		}
-		defer conn.Close()
+		defer func() {
+			fmt.Println("Closing connection")
+			conn.Close()
+		}()
 
 		hub.AddClient(conn)
 		fmt.Println("Client connected")
 
 		for {
-			time.Sleep(10 * time.Second)
-			hub.broadcast <- []byte("external message to all clients!")
+			select {
+			case <-testBroadcastTrigger:
+				fmt.Println("Trigger received, broadcasting message...")
+				hub.broadcast <- []byte("external message to all clients!")
+				select {
+				case testMessageSent <- struct{}{}:
+					fmt.Println("Message sent signal emitted")
+				default:
+					fmt.Println("Message sent signal skipped (buffer full)")
+				}
+			case <-time.After(10 * time.Second):
+				fmt.Println("Broadcasting periodic message...")
+				hub.broadcast <- []byte("external message to all clients!")
+			}
 		}
 	}
 }
