@@ -43,6 +43,7 @@ func (h *Hub) Run() {
 		for client := range h.clients {
 			err := client.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
+				fmt.Printf("Failed to send message to client: %v", err)
 				client.Close()
 				delete(h.clients, client)
 			}
