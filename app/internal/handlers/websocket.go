@@ -8,6 +8,7 @@ import (
 	"time"
 
 	//third-party
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gorilla/websocket"
 )
 
