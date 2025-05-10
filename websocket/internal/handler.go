@@ -16,11 +16,11 @@ func HandleWebSocket(hub *Hub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := Upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			fmt.Println("Failed to upgrade connection:", err)
+			fmt.Println("HandleWebSocket: Failed to upgrade connection:", err)
 			return
 		}
 
 		hub.AddClient(conn)
-		fmt.Println("Client connected")
+		fmt.Println("HandleWebSocket: Client added to Hub")
 	}
 }

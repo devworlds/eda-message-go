@@ -13,13 +13,8 @@ func Start() {
 
 	go func() {
 		for {
-			select {
-			case <-TestBroadcastTrigger:
-				hub.Broadcast <- []byte("external message to all clients!")
-				TestMessageSent <- struct{}{}
-			case <-time.After(10 * time.Second):
-				hub.Broadcast <- []byte("external message to all clients!")
-			}
+			time.Sleep(10 * time.Second)
+			hub.Broadcast <- []byte("external message to all clients!")
 		}
 	}()
 
