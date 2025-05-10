@@ -1,4 +1,4 @@
-package handlers
+package websocket
 
 import (
 	"fmt"
@@ -7,23 +7,24 @@ import (
 	"testing"
 	"time"
 
+	ws "github.com/devworlds/eda-message-go/websocket/internal"
 	"github.com/gorilla/websocket"
 )
 
 func TestNewHub(t *testing.T) {
-	hub := NewHub()
+	hub := ws.NewHub()
 	if hub == nil {
 		t.Fatal("Expected NewHub to return a non-nil Hub")
 	}
-	if len(hub.clients) != 0 {
+	if len(hub.Clients) != 0 {
 		t.Fatal("Expected no clients in a new Hub")
 	}
 }
 
 func TestAddClient(t *testing.T) {
-	hub := NewHub()
+	hub := ws.NewHub()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		conn, _ := upgrader.Upgrade(w, r, nil)
+		conn, _ := ws.Upgrader.Upgrade(w, r, nil)
 		hub.AddClient(conn)
 	}))
 	defer server.Close()
@@ -34,18 +35,18 @@ func TestAddClient(t *testing.T) {
 		t.Fatalf("Failed to connect to WebSocket server: %v", err)
 	}
 
-	hub.mu.Lock()
-	if len(hub.clients) != 1 {
-		t.Fatalf("Expected 1 client, got %d", len(hub.clients))
+	hub.Mu.Lock()
+	if len(hub.Clients) != 1 {
+		t.Fatalf("Expected 1 client, got %d", len(hub.Clients))
 	}
-	hub.mu.Unlock()
+	hub.Mu.Unlock()
 }
 
 func TestHandleWebSocket(t *testing.T) {
-	hub := NewHub()
+	hub := ws.NewHub()
 	go hub.Run() // Ensure the Hub's Run method is running
 
-	h := HandleWebSocket(hub)
+	h := ws.HandleWebSocket(hub)
 	server := httptest.NewServer(h)
 	defer server.Close()
 
@@ -57,11 +58,11 @@ func TestHandleWebSocket(t *testing.T) {
 	defer conn.Close()
 
 	// Trigger an immediate broadcast for testing
-	testBroadcastTrigger <- struct{}{}
+	ws.TestBroadcastTrigger <- struct{}{}
 
 	// Wait for the message to be sent
 	select {
-	case <-testMessageSent:
+	case <-ws.TestMessageSent:
 		fmt.Println("Test: Message sent signal received")
 	case <-time.After(5 * time.Second):
 		t.Fatal("Timeout waiting for message to be sent")
