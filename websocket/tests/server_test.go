@@ -31,13 +31,13 @@ func TestHandleWebSocket(t *testing.T) {
 
 	// Mock the AddClient method
 	mockHub.On("AddClient", mock.Anything).Return()
-	// Mock the RemoveClient method
-	mockHub.On("RemoveClient", mock.Anything).Return()
-	// Mock the BroadcastMessage method
-	mockHub.On("BroadcastMessage", mock.Anything).Return()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+		upgrader := websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			t.Fatalf("Failed to upgrade connection: %v", err)
 		}
@@ -46,6 +46,12 @@ func TestHandleWebSocket(t *testing.T) {
 			mockHub.RemoveClient(conn)
 			conn.Close()
 		}()
+		mockHub.On("RemoveClient", mock.Anything).Run(func(args mock.Arguments) {
+			client := args.Get(0).(*websocket.Conn)
+			if client.LocalAddr().String() != conn.LocalAddr().String() || client.RemoteAddr().String() != conn.RemoteAddr().String() {
+				t.Fatalf("RemoveClient called with unexpected connection: got %v, want %v", client, conn)
+			}
+		}).Return()
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
@@ -70,6 +76,11 @@ func TestHandleWebSocket(t *testing.T) {
 		t.Fatalf("Failed to send message: %v", err)
 	}
 
+	// Mock the BroadcastMessage method to validate the argument
+	mockHub.On("BroadcastMessage", mock.MatchedBy(func(message []byte) bool {
+		return string(message) == "Hello, WebSocket!"
+	})).Return()
+
 	// Allow some time for the message to be processed
 	time.Sleep(1 * time.Second)
 
@@ -81,5 +92,4 @@ func TestHandleWebSocket(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to close WebSocket connection: %v", err)
 	}
-	mockHub.AssertCalled(t, "RemoveClient", mock.Anything)
 }
