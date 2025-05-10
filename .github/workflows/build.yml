@@ -31,25 +31,21 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
-        working-directory: app
 
       - name: Lint
         run: |
           go install golang.org/x/lint/golint@latest
           golint ./...
           go vet ./...
-        working-directory: app
 
       - name: Run gosec (Security Scanner)
         run: |
           go install github.com/securego/gosec/v2/cmd/gosec@latest
           gosec ./...
-        working-directory: app
 
       - name: Run tests with coverage
         run: |
           go test -v -coverprofile=coverage.out ./...
-        working-directory: app
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -59,4 +55,3 @@ jobs:
 
       - name: Build
         run: go build -v ./...
-        working-directory: app
