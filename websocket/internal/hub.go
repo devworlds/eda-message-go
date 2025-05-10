@@ -47,3 +47,9 @@ func (h *Hub) AddClient(conn *websocket.Conn) {
 	h.Clients[conn] = true
 	h.Mu.Unlock()
 }
+
+func (h *Hub) RemoveClient(conn *websocket.Conn) {
+	h.Mu.Lock()
+	defer h.Mu.Unlock()
+	delete(h.Clients, conn)
+}
