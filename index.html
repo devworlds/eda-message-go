@@ -2,32 +2,67 @@
 <html>
 <head>
     <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 80%;
+            max-width: 600px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        li:nth-child(even) {
+            background-color: #fff;
+        }
+    </style>
 </head>
 <body>
     <h1>WebSocket Client</h1>
-    <input type="text" id="messageInput" placeholder="Type a message...">
-    <button id="sendButton">Send</button>
     <ul id="messages"></ul>
 
     <script>
         const ws = new WebSocket("ws://localhost:8080/ws");
-        const messageInput = document.getElementById("messageInput");
-        const sendButton = document.getElementById("sendButton");
         const messages = document.getElementById("messages");
 
         ws.onmessage = (event) => {
             const li = document.createElement("li");
             li.textContent = `Server: ${event.data}`;
             messages.appendChild(li);
-        };
-
-        sendButton.onclick = () => {
-            const message = messageInput.value;
-            ws.send(message);
-            const li = document.createElement("li");
-            li.textContent = `You: ${message}`;
-            messages.appendChild(li);
-            messageInput.value = "";
         };
     </script>
 </body>
