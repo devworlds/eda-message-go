@@ -12,7 +12,7 @@ var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func HandleWebSocket(hub *Hub) http.HandlerFunc {
+func HandleWebSocket(hub IHub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := Upgrader.Upgrade(w, r, nil)
 		if err != nil {
