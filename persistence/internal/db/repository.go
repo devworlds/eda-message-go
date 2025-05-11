@@ -2,10 +2,10 @@ package db
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func SaveMessage(database *gorm.DB, msg *kafka.Message) error {
@@ -13,8 +13,15 @@ func SaveMessage(database *gorm.DB, msg *kafka.Message) error {
 	if err := json.Unmarshal(msg.Value, &message); err != nil {
 		return err
 	}
-	// Idempotent insert (upsert)
-	if err := database.Clauses(clause.OnConflict{DoNothing: true}).Create(&message).Error; err != nil {
+
+	var existingMessage Message
+	if err := database.First(&existingMessage, "id = ?", message.ID).Error; err == nil {
+		return fmt.Errorf("mensage with ID %s already exist", message.ID)
+	} else if err != gorm.ErrRecordNotFound {
+		return err
+	}
+
+	if err := database.Create(&message).Error; err != nil {
 		return err
 	}
 	return nil

@@ -1,7 +1,9 @@
 package kafka
 
 import (
+	"fmt"
 	"log"
+
 	"github.com/devworlds/eda-message-go/persistence/internal/db"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -15,7 +17,7 @@ func NewConsumer(brokers []string, group, topic string) *kafka.Consumer {
 		"auto.offset.reset": "earliest",
 	})
 	if err != nil {
-		log.Fatalf("Failed to create consumer: %v", err)
+		log.Fatalf("Persistance: Failed to create consumer: %v", err)
 	}
 	c.SubscribeTopics([]string{topic}, nil)
 	return c
@@ -25,13 +27,14 @@ func ConsumeLoop(consumer *kafka.Consumer, database *gorm.DB) {
 	for {
 		msg, err := consumer.ReadMessage(-1)
 		if err != nil {
-			log.Printf("Error reading message: %v", err)
+			log.Printf("Persistance: Error reading message: %v", err)
 			continue
 		}
 		if err := db.SaveMessage(database, msg); err != nil {
-			log.Printf("Error saving message: %v", err)
+			log.Printf("Persistance: Error saving message: %v", err)
 			continue
 		}
 		consumer.CommitMessage(msg)
+		fmt.Printf("Persistance: Message consumed: %s\n", msg.Value)
 	}
 }
