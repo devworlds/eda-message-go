@@ -1,33 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebSocket Client</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+        li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+            color: #333;
+        }
+
+        li:nth-child(odd) {
+            background: #dee2e6;
+        }
+    </style>
 </head>
 <body>
-    <h1>WebSocket Client</h1>
-    <input type="text" id="messageInput" placeholder="Type a message...">
-    <button id="sendButton">Send</button>
-    <ul id="messages"></ul>
+    <div id="container">
+        <h1>Messages</h1>
+        <ul id="messages"></ul>
+    </div>
 
     <script>
-        const ws = new WebSocket("ws://localhost:8080/ws");
-        const messageInput = document.getElementById("messageInput");
-        const sendButton = document.getElementById("sendButton");
+        const ws = new WebSocket("ws://localhost:30080/ws");
         const messages = document.getElementById("messages");
 
         ws.onmessage = (event) => {
-            const li = document.createElement("li");
-            li.textContent = `Server: ${event.data}`;
-            messages.appendChild(li);
+            const message = document.createElement("li");
+            message.textContent = event.data;
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
         };
 
-        sendButton.onclick = () => {
-            const message = messageInput.value;
-            ws.send(message);
-            const li = document.createElement("li");
-            li.textContent = `You: ${message}`;
-            messages.appendChild(li);
-            messageInput.value = "";
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
         };
     </script>
 </body>
