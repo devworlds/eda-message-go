@@ -12,6 +12,7 @@ var Upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
+// HandleWebSocket handles WebSocket connections and adds them to the Hub.
 func HandleWebSocket(hub IHub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := Upgrader.Upgrade(w, r, nil)
