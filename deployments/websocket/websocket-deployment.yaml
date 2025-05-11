@@ -23,6 +23,13 @@ spec:
         env:
         - name: KAFKA_BROKER
           value: "kafka:9092"
+        - name: ENVIRONMENT
+          value: "staging"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: jwtSecret
 ---
 apiVersion: v1
 kind: Service

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: persistence-service
+  labels:
+    app: persistence
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: persistence
+  template:
+    metadata:
+      labels:
+        app: persistence
+    spec:
+      containers:
+      - name: persistence
+        image: persistence-service:latest
+        imagePullPolicy: Never
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:admin@postgres-postgresql:5432/postgres"
+        - name: KAFKA_BROKER
+          value: "kafka:9092"
+        - name: KAFKA_GROUP
+          value: "persistence-group"
+        - name: KAFKA_TOPIC
+          value: "websocket-messages"
