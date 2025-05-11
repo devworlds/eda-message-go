@@ -1,9 +1,10 @@
-package websocket
+package handler
 
 import (
 	"fmt"
 	"net/http"
 
+	"github.com/devworlds/eda-message-go/websocket/internal/interfaces"
 	"github.com/gorilla/websocket"
 )
 
@@ -13,7 +14,7 @@ var Upgrader = websocket.Upgrader{
 }
 
 // HandleWebSocket handles WebSocket connections and adds them to the Hub.
-func HandleWebSocket(hub IHub) http.HandlerFunc {
+func HandleWebSocket(hub interfaces.IHub) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := Upgrader.Upgrade(w, r, nil)
 		if err != nil {

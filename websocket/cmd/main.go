@@ -1,7 +1,7 @@
 package main
 
-import websocket "github.com/devworlds/eda-message-go/websocket/internal"
+import "github.com/devworlds/eda-message-go/websocket/internal/server"
 
 func main() {
-	websocket.Start()
+	server.Start()
 }

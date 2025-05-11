@@ -1,4 +1,4 @@
-package websocket
+package handler
 
 import (
 	"net/http"
@@ -7,10 +7,12 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/mock"
+
+	m "github.com/devworlds/eda-message-go/websocket/internal/mock"
 )
 
 func TestHandleWebSocket(t *testing.T) {
-	mockHub := new(MockHub) // Assuming MockHub is defined in the mock.go file
+	mockHub := new(m.MockHub) // Assuming MockHub is defined in the mock.go file
 
 	// Mock the AddClient method
 	mockHub.On("AddClient", mock.Anything).Return()
@@ -32,7 +34,7 @@ func TestHandleWebSocket(t *testing.T) {
 }
 
 func TestHandleWebSocket_UpgradeConnection(t *testing.T) {
-	mockHub := new(MockHub)
+	mockHub := new(m.MockHub)
 
 	// Mock the AddClient method
 	mockHub.On("AddClient", mock.Anything).Return()

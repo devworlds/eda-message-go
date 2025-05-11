@@ -1,19 +1,23 @@
-package websocket
+package server
 
 import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/devworlds/eda-message-go/websocket/internal/handler"
+	"github.com/devworlds/eda-message-go/websocket/internal/hub"
+	"github.com/devworlds/eda-message-go/websocket/internal/kafka"
 )
 
 // Start initializes the WebSocket server and starts the Kafka consumer.
 func Start() {
-	hub := NewHub()
+	hub := hub.NewHub()
 	go hub.Run()
 
-	startKafkaConsumer(hub)
+	kafka.StartKafkaConsumer(hub)
 
-	http.HandleFunc("/ws", HandleWebSocket(hub))
+	http.HandleFunc("/ws", handler.HandleWebSocket(hub))
 	port := ":8080"
 	fmt.Printf("Server is running on http://localhost%s\n", port)
 

@@ -1,4 +1,4 @@
-package websocket
+package mock
 
 import (
 	"github.com/gorilla/websocket"
