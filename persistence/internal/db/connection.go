@@ -1,6 +1,8 @@
 package db
 
 import (
+	"log"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,10 +14,14 @@ func Connect(dsn string) (*gorm.DB, error) {
 	}
 
 	if !db.Migrator().HasTable(&Message{}) {
-		db.AutoMigrate(&Message{})
+		if err := db.AutoMigrate(&Message{}); err != nil {
+			log.Printf("Error migrating Message table: %v", err)
+		}
 	}
 	if !db.Migrator().HasTable(&User{}) {
-		db.AutoMigrate(&User{})
+		if err := db.AutoMigrate(&User{}); err != nil {
+			log.Printf("Error migrating User table: %v", err)
+		}
 		// Insert initial users
 		initialUsers := []User{
 			{ID: "1", Username: "client1", Password: "password1"},

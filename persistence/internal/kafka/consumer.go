@@ -34,7 +34,10 @@ func ConsumeLoop(consumer *kafka.Consumer, database *gorm.DB) {
 			log.Printf("Persistance: Error saving message: %v", err)
 			continue
 		}
-		consumer.CommitMessage(msg)
+		_, err = consumer.CommitMessage(msg)
+		if err != nil {
+			log.Printf("Error committing message: %v", err)
+		}
 		fmt.Printf("Persistance: Message consumed: %s\n", msg.Value)
 	}
 }

@@ -53,14 +53,18 @@ func (h *Hub) AddClient(conn *websocket.Conn) {
 	_, msg, err := conn.ReadMessage()
 	if err != nil {
 		fmt.Printf("AddClient: Failed to read first message: %v\n", err)
-		conn.Close()
+		if err := conn.Close(); err != nil {
+			fmt.Printf("Error closing connection: %v\n", err)
+		}
 		return
 	}
 
 	fmt.Printf("AddClient: Received first message: %s\n", string(msg))
 	if !h.Validator.ValidateJWT(string(msg)) {
 		fmt.Printf("AddClient: Invalid JWT: %s\n", msg)
-		conn.Close()
+		if err := conn.Close(); err != nil {
+			fmt.Printf("Error closing connection: %v\n", err)
+		}
 		return
 	}
 
