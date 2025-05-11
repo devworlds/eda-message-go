@@ -17,7 +17,7 @@ func StartKafkaConsumer(h *hub.Hub) {
 		r := kafka.NewReader(kafka.ReaderConfig{
 			Brokers: []string{"kafka:9092"},
 			Topic:   "websocket-messages",
-			
+			//GroupID: "consumer-group",
 		})
 		defer r.Close()
 
