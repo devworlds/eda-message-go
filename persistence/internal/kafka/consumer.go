@@ -19,7 +19,10 @@ func NewConsumer(brokers []string, group, topic string) *kafka.Consumer {
 	if err != nil {
 		log.Fatalf("Persistance: Failed to create consumer: %v", err)
 	}
-	c.SubscribeTopics([]string{topic}, nil)
+	if err := c.SubscribeTopics([]string{topic}, nil); err != nil {
+		log.Printf("Error subscribing to topics: %v", err)
+		return nil
+	}
 	return c
 }
 
