@@ -1,17 +1,14 @@
-# Etapa 1: Build
-FROM golang:1.23 AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-COPY ./go.mod ./go.sum ./
+COPY ../go.mod ../go.sum ./
 RUN go mod download
 
-COPY ./websocket ./websocket
+COPY . ./
 
-# Compilar binário estaticamente!
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o websocket-service ./websocket/cmd/main.go
 
-# Etapa 2: Runtime
 FROM gcr.io/distroless/base-debian10
 
 WORKDIR /app
