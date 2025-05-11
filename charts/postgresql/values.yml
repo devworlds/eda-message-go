@@ -1,0 +1,7 @@
+auth:
+  postgresPassword: suasenha
+
+service:
+  type: NodePort
+  nodePorts:
+    postgresql: 30007

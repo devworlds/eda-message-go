@@ -1,0 +1,35 @@
+kraft:
+  enabled: true
+  controller:
+    replicaCount: 3
+  broker:
+    replicaCount: 3
+
+replicaCount: 3
+
+listeners:
+  client:
+    protocol: PLAINTEXT
+    port: 9092
+
+advertisedListeners:
+  client:
+    protocol: PLAINTEXT
+    port: 9092
+    
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+auth:
+  enabled: false
+
+zookeeper:
+  enabled: false
+
+service:
+  type: LoadBalancer
