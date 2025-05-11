@@ -4,19 +4,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 )
 
+// Start initializes the WebSocket server and starts the Kafka consumer.
 func Start() {
 	hub := NewHub()
 	go hub.Run()
 
-	go func() {
-		for {
-			time.Sleep(10 * time.Second)
-			hub.Broadcast <- []byte("external message to all clients!")
-		}
-	}()
+	startKafkaConsumer(hub)
 
 	http.HandleFunc("/ws", HandleWebSocket(hub))
 	port := ":8080"
