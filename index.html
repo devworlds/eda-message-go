@@ -2,80 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Messages</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        #container {
-            background: #ffffff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            background: #f9f9f9;
-        }
-
-        li {
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #e9ecef;
-            border-radius: 4px;
-            color: #333;
-        }
-
-        li:nth-child(odd) {
-            background: #dee2e6;
-        }
-    </style>
+    <title>WebSocket Client</title>
 </head>
 <body>
-    <div id="container">
-        <h1>Messages</h1>
-        <ul id="messages"></ul>
-    </div>
+    <h2>WebSocket Client</h2>
+    <input type="text" id="messageInput" placeholder="Enter message" />
+    <button onclick="sendMessage()">Send</button>
+    <pre id="messages"></pre>
 
     <script>
-        const ws = new WebSocket("ws://localhost:30080/ws");
-        const messages = document.getElementById("messages");
+        let socket = new WebSocket("ws://localhost:30080/ws");
 
-        ws.onmessage = (event) => {
-            const message = document.createElement("li");
-            message.textContent = event.data;
-            messages.appendChild(message);
-            messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
+        socket.onopen = function(event) {
+            document.getElementById("messages").textContent += "Connected to WebSocket server\n";
         };
 
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
+        socket.onmessage = function(event) {
+            document.getElementById("messages").textContent += "Received: " + event.data + "\n";
         };
+
+        socket.onclose = function(event) {
+            document.getElementById("messages").textContent += "Disconnected from WebSocket server\n";
+        };
+
+        function sendMessage() {
+            let message = document.getElementById("messageInput").value;
+            socket.send(message);
+            document.getElementById("messageInput").value = "";
+        }
     </script>
 </body>
 </html>
