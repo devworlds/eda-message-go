@@ -215,6 +215,56 @@ This architecture ensures secure authentication, reliable message delivery, and 
 
 ---
 
+### Usage
+
+Below are example usage scenarios for interacting with the application:
+
+---
+
+#### **Scenario 1: Successful Authentication and Real-Time Messaging**
+
+After completing the port forwarding steps, open `index.html` in your browser. This page provides a simple interface to connect to the WebSocket server.
+
+1. **Generate a JWT Token:**
+   Use the `/login` endpoint to authenticate with your username and password. The response will include a JWT token.
+
+2. **Connect to the WebSocket Server:**
+   Use the interface in `index.html` to establish a WebSocket connection.
+
+3. **Authenticate:**
+   As the **first message**, send your JWT token through the WebSocket connection.
+   If the token is valid, you will be authenticated and added to the hub of authenticated clients.
+
+4. **Send and Receive Messages:**
+   Once authenticated, you can send and receive real-time messages.
+   Example message format:
+
+   ```json
+   {
+     "id": "023e4567-e89b-12d3-a456-426614174000",
+     "content": "Player 7 pick one cards.",
+     "timestamp": "2024-05-11T15:30:00Z"
+   }
+   ```
+
+   When you send a message:
+   - It is published to the Kafka topic `websocket-messages`.
+   - The Persistence Service consumes the message and saves it to PostgreSQL.
+   - The WebSocket Service also consumes the message and broadcasts it to all authenticated clients in real time.
+
+---
+
+#### **Scenario 2: Invalid Authentication**
+
+If you open `index.html` and connect to the WebSocket server, but the **first message** you send is **not** a valid JWT token, the server will immediately close your connection.
+
+**Note:**
+Clients must be authenticated before they can send or receive any broadcast messages. Only after successful authentication (by sending a valid JWT token as the first message) will the client be able to participate in real-time messaging.
+
+---
+
+This flow ensures secure, real-time communication where only authenticated users can interact with the system.
+
 #### **Notes**
 
 - Make sure your Docker context is set to Minikube (`eval $(minikube docker-env)`) before building images.
